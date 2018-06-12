@@ -1,0 +1,45 @@
+---
+title: "COMPSCIX 415.2 Homework 1"
+author: "Praveen Chander"
+date: "June 11, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#My Github repository for my assignments can be found at this URL: https://github.com/praveenchander/compscix-415-2-assignments.git
+
+```{r results='asis', warning=FALSE, message=FALSE}
+library(mdsr)
+library(tidyverse)
+data("WorldCities")
+```
+#Q1
+Following are the datatypes of each Feature(10) in "WorldCities" - Code, Name, Latitiude, Longitude, Country, CountryRegion, Populaton, RegionCode, Region & Date  
+
+
+```{r warning=FALSE, message=TRUE}
+glimpse(WorldCities)
+```
+
+Printing the first 200 records
+```{r warning=FALSE, message=TRUE}
+wc <- head(WorldCities, 200)
+print(wc)
+```
+Printing the Distinct Country Code of the 200 records
+```{r warning=FALSE, message=TRUE}
+country_col <- WorldCities$country
+unique(country_col)
+```
+#Q2
+Printing the Distinct Region values from the entire dataset
+```{r warning=FALSE, message=TRUE}
+unique(WorldCities$region)
+```
+
+
+
+
