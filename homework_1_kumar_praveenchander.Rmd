@@ -17,7 +17,11 @@ library(tidyverse)
 data("WorldCities")
 ```
 #Q1
-Following are the datatypes of each Feature(10) in "WorldCities" - Code, Name, Latitiude, Longitude, Country, CountryRegion, Populaton, RegionCode, Region & Date  
+Following are the datatypes for the 10 Features from the dataset "WorldCities":
+
+Features: Code, Name, Latitiude, Longitude, Country, CountryRegion, Populaton, RegionCode, Region & Date
+
+Observations: 23,018
 
 
 ```{r warning=FALSE, message=TRUE}
@@ -40,6 +44,20 @@ Printing the Distinct Region values from the entire dataset
 unique(WorldCities$region)
 ```
 
+#Q3
+Printing Unique values using %>% Operator
+```{r warning=FALSE, message=TRUE}
+WorldCities %>% select(country) %>% unique()
+```
 
+#Q4
+```{r warning=FALSE, message=TRUE}
+WorldCities %>% ggplot(aes(x = population)) +
+geom_histogram() +
+xlab('City Population')
+
+WorldCities %>% ggplot(aes(x = population)) + geom_histogram() + xlab('Updated Population') + ylab('Updated Count') + ggtitle('Updated Population Details') + theme_bw()
+
+```
 
 
