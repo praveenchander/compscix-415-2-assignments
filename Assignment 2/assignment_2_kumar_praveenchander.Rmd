@@ -50,7 +50,7 @@ ggplot(mpg, aes(displ, hwy)) + geom_point() + geom_smooth(method=lm)
 # colour is a separate variable to be passed and is not part of aes variables
 # Correct one for passing explicit colour
 ggplot(mpg) + geom_point(aes(displ, hwy), colour="blue")
-# Incorrect one, should be equated to a categorical or continuous feature
+# Incorrect one, should be "color" without U & equated to a categorical or continuous feature
 ggplot(mpg) + geom_point(aes(displ, hwy, colour="blue"))
 ```
 
@@ -71,7 +71,7 @@ ggplot(mpg) + geom_point(aes(displ, hwy, color=class, size=manufacturer, shape=f
 
 ##Q4 (3.3.1)
 ```{r}
-# Mapping same categorical variable to multiple aesthetic will display only those selected 6 featurres, other records are REMOVED 
+# Mapping same categorical variable to multiple aesthetic will display only those selected 6 featurres, other records are REMOVED
 ggplot(mpg) + geom_point(aes(displ, hwy, color=class, size=class, shape=class))
 ```
 
@@ -86,3 +86,75 @@ ggplot(mpg) + geom_point(aes(displ, hwy, color=class, stroke = 5))
 # when a logical function is used on a variable, the plot becomes binominal classification (TRUE/FALSE)
 ggplot(mpg) + geom_point(aes(displ, hwy, color=year>2005))
 ```
+
+#3.5.1
+##Q4 (3.5.1)
+```{r execise3.5.1}
+# Advantage -> clear plot for a each categorical value
+# Disadvantage -> difficult with huge dataset and cannot compare with other value in the category w.r.t color aesthetic
+ggplot(mpg) + geom_point(aes(displ, hwy)) + facet_wrap(~class, nrow = 2)
+ggplot(mpg) + geom_point(aes(displ, hwy, color = class))
+```
+
+##Q5 (3.5.1)
+```{r}
+# The values should be selected such that the actual values are within nrow*ncol
+# nrow -> number of rows the values to be plotted
+# ncol -> number of columns the values to be plotted
+ggplot(mpg) + geom_point(aes(displ, hwy)) + facet_wrap(~class, nrow = 5, ncol = 2)
+# display as a table
+ggplot(mpg) + geom_point(aes(displ, hwy)) + facet_wrap(~class, as.table = TRUE)
+# facet_grid do not have ncol and nrow and it is always displayed in a SINGLE row
+ggplot(mpg) + geom_point(aes(displ, hwy)) + facet_grid(.~model)
+```
+
+#3.6.1
+##Q1 (3.6.1)
+```{r warning=FALSE, message=TRUE}
+# geom_smooth, geom_boxplot, geom_histogram, geom_area
+ggplot(mpg, aes(displ, hwy)) + geom_smooth()
+ggplot(mpg, aes(displ, hwy)) + geom_boxplot()
+ggplot(mpg, aes(displ)) + geom_histogram()
+ggplot(mpg, aes(displ, hwy)) + geom_area()
+```
+
+##Q2 (3.6.1)
+```{r warning=FALSE, message=TRUE}
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + geom_point() + geom_smooth(se = FALSE)
+```
+
+##Q3 (3.6.1)
+```{r warning=FALSE, message=TRUE}
+# show.legend = FALSE will not display the graph legends based on "drv"
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + geom_smooth(show.legend = FALSE)
+```
+
+##Q4 (3.6.1)
+```{r warning=FALSE, message=TRUE}
+#se = TRUE will display the whole point cloud interval considered for the line, if FALSE then it will switch off the feature
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy, color = drv)) + geom_smooth(se = TRUE)
+```
+
+##Q5 (3.6.1)
+```{r warning=FALSE, message=TRUE}
+# aesthestic features are set as GLOBAL, available for all subsequent geomentries 
+ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) + geom_point() + geom_smooth()
+# aesthestic features are set as LOCAL
+ggplot() + geom_point(data = mpg, mapping = aes(x = displ, y = hwy)) + geom_smooth(data = mpg, mapping = aes(x = displ, y = hwy))
+```
+
+#3.7.1
+##Q2 (3.7.1)
+```{r warning=FALSE, message=TRUE}
+# count for each "displ" data
+ggplot(mpg, aes(displ)) + geom_bar() 
+# MEAN for each "displ" data w.r.t "hwy" mileage
+ggplot(mpg, aes(displ, hwy)) + geom_col()
+```
+
+#Answer to infographics:
+https://static.guim.co.uk/sys-images/Guardian/Pix/pictures/2012/3/2/1330695817953/EMC2-graphic-on-data-scie-008.jpg
+
+## When there are several categories i would have used different color codes
+
+## for binary comparison as in case of "Characteristics of data scientists", this works better in conveying the info
