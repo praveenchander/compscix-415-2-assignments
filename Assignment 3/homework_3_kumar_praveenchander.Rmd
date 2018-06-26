@@ -1,0 +1,154 @@
+---
+title: "COMPSCIX 415.2 Homework 3"
+author: "Praveen Chander"
+date: "June 23, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load_package, echo=FALSE}
+library('ggplot2')
+library('tidyverse')
+data(mpg)
+data("diamonds")
+```
+#3.8.1
+##Q1
+In the Question, The plot is skewed between these 2 continuous variables, Therefore instead of using geom_plot(), if geom_jitter() is used the skeness is reduced and also can be plotted w.r.t a **dimensional variable** like "Displacement" as FACTOR for the color
+
+```{r warning=FALSE, message=TRUE}
+ggplot(data=mpg, mapping = aes(x=cty, y=hwy)) +geom_jitter(aes(colour=factor(displ)))
+
+# This can still more be grouped by class of the vehicle
+ggplot(data=mpg, mapping = aes(x=cty, y=hwy)) +geom_jitter(aes(colour=factor(displ))) + facet_wrap(~class, nrow = 1, ncol = 7)
+```
+
+##Q2
+The Parameters that control the amount of jittering are WIDTH & HEIGHT
+```{r warning=FALSE, message=TRUE}
+ggplot(mpg, aes(cty, hwy)) + geom_jitter(aes(colour=factor(displ)), width = 0.25, height = 0.25)
+```
+
+##Q3
+--> Unlike geom_jitter(), geom_count() exhibit a **skewed** plot.
+--> Count has to be plotted w.r.t any **dimensional** categorical variable.
+--> For geom_count() you can plot a graph with *point SIZE propotional with a count of a variable*. This is Best used in conjunction with scale_size_area. Larger counts in a particular portion has a big size point plotted
+
+```{r warning=FALSE, message=TRUE}
+ggplot(mpg, aes(cty, hwy)) + geom_jitter(aes(colour=factor(displ)))
+ggplot(mpg, aes(cty, hwy)) + geom_count(aes(size = ..prop.., group = displ)) + scale_size_area(max_size = 10)
+```
+
+##Q4
+Default position adjustment for geom_boxplot() is **position='dodge'**
+```{r warning=FALSE, message=TRUE}
+X <- ggplot(data = mpg, mapping = aes(x=drv, y=hwy, fill=as.factor(class)))
+X + geom_boxplot() # with no position
+X + geom_boxplot(position='dodge') # with dodge, looks the same as default
+X + geom_boxplot(position='identity')
+X + geom_boxplot(position='jitter')
+```
+
+#3.9.1
+##Q2
+labs() when set NULL the labels are not displayed, else will display to the set values for the individual values of **X and Y labels** as below
+
+```{r warning=FALSE, message=TRUE}
+# With labs()
+bar <- ggplot(data = diamonds) +
+  geom_bar(
+    mapping = aes(x = cut, fill = cut),
+    show.legend = FALSE,
+    width = 1
+  ) +
+  theme(aspect.ratio = 1) +
+  labs(x = NULL, y = NULL)
+
+# without labs()
+bar2 <- ggplot(data = diamonds) +
+  geom_bar(
+    mapping = aes(x = cut, fill = cut),
+    show.legend = FALSE,
+    width = 1
+  ) +
+  theme(aspect.ratio = 1) + labs(x="test x label", y="test y label")
+
+bar
+bar2
+```
+
+##Q4
+1.What does the plot below tell you about the relationship between city and highway mpg? - *Graph shows at what points the city mileage is worse than highway*
+2.Why is coord_fixed() important? - *ensures that one unit on the x-axis is the same length as one unit on the y-axis*
+3.What does geom_abline() - *Used to draw the slope*
+```{r warning=FALSE, message=TRUE}
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point()
+
+ggplot(data = mpg, mapping = aes(x = cty, y = hwy)) +
+  geom_point() +
+  geom_abline() +
+  coord_fixed()
+```
+
+#4.4
+##Q1
+my_variable <- 10
+my_varıable
+Variable name should be given exactly as defined, in this case should be my_var**i**able
+```{r warning=FALSE, message=TRUE}
+my_variable <- 10
+my_variable
+```
+
+##Q2
+Filtered dataset can be assigned to a variable and that variable can be used in the ggplot
+```{r warning=FALSE, message=TRUE}
+mpg_8 <- mpg %>% filter(cyl == 8)
+ggplot(data = mpg_8) + geom_point(mapping = aes(x = displ, y = hwy))
+
+diamond_above3 <- diamonds %>% filter(carat > 3)
+ggplot(data = diamond_above3) + geom_point(mapping = aes(x = carat, y = cut))
+```
+
+#5.2.4
+##Q1
+```{r warning=FALSE, message=TRUE}
+library(nycflights13)
+#1. Had an arrival delay of two or more hours
+filter(flights, arr_delay >= 120)
+#2. Flew to Houston (IAH or HOU)
+filter(flights, dest=='IAH'|dest=='HOU')
+#3. Were operated by United, American, or Delta
+filter(flights, carrier %in% c('UA','AA','DL'))
+#4. Departed in summer (July, August, and September)
+filter(flights, month %in% c(7,8,9))
+#5. Arrived more than two hours late, but didn’t leave late
+filter(flights, arr_delay>120 & dep_delay==0)
+#6. Were delayed by at least an hour, but made up over 30 minutes in flight
+filter(flights, dep_delay>=60 & arr_delay<=dep_delay-30)
+#7. Departed between midnight and 6am (inclusive)
+filter(flights, dep_time>=0000 & dep_time <=0600)
+```
+##Q3
+Flights missing dep_time, all actual flight related variables are also missing data for these records. Therefore, these rows represent the flights that were **CANCELED**
+```{r warning=FALSE, message=TRUE}
+filter(flights, is.na(dep_time))
+```
+#5.4.1
+##Q1
+```{r warning=FALSE, message=TRUE}
+select(flights, dep_time, dep_delay, arr_time, arr_delay)
+df <- flights %>% dplyr:: select(starts_with("arr"), starts_with("dep"))
+df
+```
+##Q3
+If the column name is not available the one_of will throw a warning, but it will still return other variables
+```{r warning=FALSE, message=TRUE}
+vars <- c("year", "month", "day", "dep_delay", "arr_delay")
+select(flights, one_of(vars))
+
+```
