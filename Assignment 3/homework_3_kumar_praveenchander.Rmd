@@ -138,6 +138,19 @@ Flights missing dep_time, all actual flight related variables are also missing d
 ```{r warning=FALSE, message=TRUE}
 filter(flights, is.na(dep_time))
 ```
+##Q4
+**NA** and its operations
+```{r warning=FALSE, message=TRUE}
+#Here NA is a placeholder of positive number and any +ve number to power of 0 is 1
+NA^1
+# Here NA is treated as logical value, therefore either TrUE or FALSE will yield the same results
+NA | TRUE
+# Here NA is with and & with FALSE, therefore results in FALSE
+FALSE & NA
+#  Any positive number times zero is 0
+NA*0
+```
+
 #5.4.1
 ##Q1
 ```{r warning=FALSE, message=TRUE}
