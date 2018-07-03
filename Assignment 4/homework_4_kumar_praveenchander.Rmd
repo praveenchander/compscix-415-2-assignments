@@ -1,0 +1,216 @@
+---
+title: "COMPSCIX 415.2 Homework 4"
+author: "Praveen Chander"
+date: "July 2, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#5.6.7
+#Q2
+Alternate commands that will give you the same output
+
+
+```{r warning=FALSE, message=FALSE}
+library(dplyr)
+library(tidyverse)
+library(nycflights13)
+
+not_cancelled <- flights %>% filter(!is.na(dep_delay), !is.na(arr_delay))
+#alternate command for not_cancelled %>% count(dest) 
+not_cancelled %>% group_by(dest) %>% summarise(n = sum(!is.na(dest)))
+
+#alternate command for not_cancelled %>% count(tailnum, wt = distance)
+not_cancelled %>% group_by(tailnum) %>% tally(wt = distance)
+```
+
+#Q4
+As the **average departure time increases the chances of the flight being cancelled also increases**, most flights are delayed within 60 minutes
+
+```{r warning=FALSE, message=FALSE}
+
+cancelled_delayed <- 
+  flights %>%
+  mutate(cancelled = (is.na(arr_delay) | is.na(dep_delay))) %>%
+  group_by(year, month, day) %>%
+  summarise(prop_cancelled = mean(cancelled),
+            avg_dep_delay = mean(dep_delay, na.rm = TRUE))
+
+ggplot(cancelled_delayed, aes(x = avg_dep_delay, prop_cancelled)) +
+  geom_point() +
+  geom_smooth()
+```
+
+#Q6
+When sort is set to TRUE, the result is sorted by Desc (highest to lowest)
+
+```{r warning=FALSE, message=FALSE}
+not_cancelled %>% count(dest,sort=T)
+```
+
+#10.5
+#Q1
+A tibble prints to fit the user screen and provides an insight of row numbers in the data set, will also be **explicitly mentioned** mtcars (data frame) is printed differently than flights(tibble) data set
+
+```{r warning=FALSE, message=FALSE}
+head(mtcars)
+as_tibble(mtcars)
+head(flights)
+```
+
+#Q2
+Compare and contrast between data.frame and Tibble
+
+```{r warning=FALSE, message=FALSE}
+df <- data.frame(abc = 1, xyz = "a")
+df$x
+df[, "xyz"]
+df[, c("abc", "xyz")]
+
+tb <- as_tibble(df)
+#Displays NULL as there is no variable with name "x"
+tb$x
+#Displays same as Data Frame, but in table format
+tb[,"xyz"]
+#Displays same as Data Frame, but in table format
+tb[, c("abc", "xyz")]
+```
+
+#Q3
+**tbl[[var]]** fetches the column name stored in **"var"**
+
+```{r warning=FALSE, message=FALSE}
+tbl <- as.tibble(mtcars)
+
+var <- "mpg"
+# Fetches the mpg column values
+tbl[[var]]
+
+mtcars %>% print(n_extra = 5)
+flights %>% print(n_extra = 19)
+dim(flights)
+
+```
+
+#Q6
+**print(n_extra = 10)** option controls how many additional column names are printed at the footer of a tibble
+
+```{r warning=FALSE, message=FALSE}
+flights %>% print(n_extra = 10)
+```
+#12.3.3
+#Q2
+The column names 1999 and 2000 should be **quoted**.
+
+```{r warning=FALSE, message=FALSE}
+
+table4a <- data_frame(
+  country = c("Afghanistan", "China"),
+  "1999" = c(745, 21222),
+  "2000" = c(2666, 31000)
+  )
+
+as_tibble(table4a)
+
+# Following code will work when the year is in a quoted text
+table4a %>%
+  gather('1999', '2000', key = "year", value = "cases")
+
+```
+
+#Q3
+A new column with the occurance can be added to differentiate the rows, Hence spread function will be executed.
+
+```{r warning=FALSE, message=FALSE}
+people <- tribble(
+  ~name,             ~key,    ~value,
+  #-----------------|--------|------
+  "Phillip Woods",   "age",       45,
+  "Phillip Woods",   "height",   186,
+  "Phillip Woods",   "age",       50,
+  "Jessica Cordero", "age",       37,
+  "Jessica Cordero", "height",   156
+)
+# spread(people, key, value)
+# This will throw following error
+# Error: Duplicate identifiers for rows (1, 3)
+glimpse(people)
+people <- tribble(
+  ~name,             ~key,    ~value, ~occurance,
+  #-----------------|--------|------|------
+  "Phillip Woods",   "age",       45, 1,
+  "Phillip Woods",   "height",   186, 1,
+  "Phillip Woods",   "age",       50, 2,
+  "Jessica Cordero", "age",       37, 1,
+  "Jessica Cordero", "height",   156, 1
+)
+spread(people, key, value)
+```
+
+#Q4
+We have to use **gather** instead of spread.
+
+```{r warning=FALSE, message=FALSE}
+
+preg <- tribble(
+  ~pregnant, ~male, ~female,
+  "yes",     NA,    10,
+  "no",      20,    12
+)
+
+gather(preg, sex, count, male, female) %>%
+  mutate(pregnant = pregnant == "yes",
+         female = sex == "female") 
+```
+
+#12.4.3
+#Q1
+**MERGE** --> Merges the remaining values to the last mapped column  
+**FILL** --> Fills missing value "NA" either left or right
+
+```{r warning=FALSE, message=FALSE}
+
+tibble(x = c("a,b,c", "d,e,f,g", "h,i,j")) %>% 
+  separate(x, c("one", "two", "three"),extra="merge")
+
+tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
+  separate(x, c("one", "two", "three"), fill="right")
+
+```
+
+#Q2
+Need to set it to FALSE if you want to create a new variable, else set it to TRUE as below
+
+```{r warning=FALSE, message=FALSE}
+
+test_dat <- tibble(x = c("a,b,c", "d,e", "f,g,i")) %>% 
+  separate(x, c("one", "two", "three"), fill="right")
+
+unite(test_dat, one, two, sep = "", remove=T)
+```
+
+
+#Loading the baby names
+
+```{r warning=FALSE, message=FALSE}
+
+file_path <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\Assignment 4\\baby_names.txt'
+file_path_csv <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\Assignment 4\\baby_names.csv'
+txt_baby_names_data <- read.delim(file=file_path, sep ="|", header = TRUE, dec =".")
+
+
+#GLIMPSE of the data from file
+glimpse(txt_baby_names_data)
+
+
+# Export this file as CSV
+csv_data <- read.csv(file=file_path,sep = "|", header = TRUE, dec =".")
+write.csv(csv_data,file_path_csv)
+
+
+# Read the CSV file
+csv_data2 <- read_csv(file=file_path_csv)
+glimpse(csv_data2)
+```
