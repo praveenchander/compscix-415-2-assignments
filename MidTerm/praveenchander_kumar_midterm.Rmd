@@ -1,0 +1,184 @@
+---
+title: "COMPSCIX 415.2 Homework 5/Midterm"
+author: "Praveen Chander"
+date: "July 10, 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#RStudio and R Markdown
+##Git Hub Link - https://github.com/praveenchander/compscix-415-2-assignments.git
+```{r load_packages, warning=FALSE, message=FALSE}
+#Used R markdown headers in the document to separate each questions and added a table of contents
+library(tidyverse)
+```
+
+
+#The Tidyverse packages
+##Q1 - Different Types of Tidyverse packages
+```{r warning=FALSE, message=TRUE}
+#Plotting - ggplot2
+# Data munging/wrangling - dplyr
+# Reshaping (speading and gathering) data - tidyr
+# Importing/exporting data - readr
+```
+
+##Q2 - Two functions from each package
+```{r warning=FALSE, message=TRUE}
+# Plotting - ggplot2 -> ggplot(), geom_point(), facet_wrap()
+# Data munging/wrangling - dplyr -> summarise(), mutate()
+# Reshaping data - tidyr -> gather(), spread()
+# Importing/exporting data - readr -> read_csv(), write_csv()
+```
+
+#R Basics
+##Q1
+```{r warning=FALSE, message=TRUE}
+My_data.name___is.too00ooLong <- c( 1 , 2 , 3 )
+My_data.name___is.too00ooLong
+```
+
+##Q2
+```{r warning=FALSE, message=TRUE}
+my_string.nm <- c('has', 'an', 'error', 'in', 'it')
+my_string.nm
+```
+
+##Q3
+```{r warning=FALSE, message=TRUE}
+# When a vector is a combination of Numeric and Character values, the end Vector becomes a Character set
+my_vector <- c(1, 2, '3', '4', 5)
+my_vector
+```
+
+#Data import/export
+##Q1
+```{r warning=FALSE, message=TRUE}
+file_path <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\MidTerm\\rail_trail.txt'
+file_path_csv <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\MidTerm\\rail_trail.csv'
+txt_rail_trail_data <- read.delim(file=file_path, sep ="|", header = TRUE, dec =".")
+
+
+#GLIMPSE of the data from file
+glimpse(txt_rail_trail_data)
+```
+
+##Q2
+```{r warning=FALSE, message=TRUE}
+# Export this file as CSV
+csv_data <- read.csv(file=file_path,sep = "|", header = TRUE, dec =".")
+write.csv(csv_data,file_path_csv)
+
+# Read the CSV file
+csv_data2 <- read_csv(file=file_path_csv)
+glimpse(csv_data2)
+```
+
+#Visualization
+##Q1 - Critique the graphic
+```{r warning=FALSE, message=TRUE}
+# 1. The Percentage of "Yes" & "No" do not sum up to 100%
+# 2. Age group further should mention if it is Men or Women
+# 3. The choice of graph is bad, a simple Bar chart would have conveyed more insight
+```
+
+##Q2 - Reproduce this graphic using the diamonds data set
+```{r warning=FALSE, message=TRUE}
+ggplot(data = diamonds) +
+  geom_boxplot(aes(x = cut, y= carat, fill = color), position = 'identity')+
+  xlab('CUT OF DIAMOND')+
+  ylab('CARAT OF DIAMOND')+
+  coord_flip()
+```
+
+##Q3 - Reproduce the graphic making it more meaningful
+```{r warning=FALSE, message=TRUE}
+# The graph now shows overlapping Carat sizes with Color
+ggplot(data = diamonds) +
+  geom_boxplot(aes(x = cut, y= carat, fill = color), position = 'dodge')+
+  xlab('CUT OF DIAMOND')+
+  ylab('CARAT OF DIAMOND')+
+  coord_flip()
+```
+
+#Data munging and wrangling
+##Q1 Spread the data with cases and populaton for the data set
+```{r warning=FALSE, message=TRUE}
+data("table2")
+glimpse(table2)
+spread(table2, type, count)
+```
+
+##Q2 Used **add_column**
+```{r warning=FALSE, message=TRUE}
+price_per_carat = diamonds$price/diamonds$carat
+new_diamonds = add_column(diamonds, price_per_carat)
+glimpse(new_diamonds)
+```
+
+##Q3
+```{r warning=FALSE, message=TRUE}
+
+diamonds %>% filter(price > 10000 & carat < 1.5) %>% mutate(tot = n()) %>% group_by(cut, tot) %>% summarise(
+    n = n(),
+    propt = mean((n()/tot)*100, na.rm = TRUE)
+  ) %>%
+  filter(n > 1)
+
+# Do the results make sense? Why? - The proportionality is only w.r.t sample size - (price > 10000 & carat < 1.5) 
+# Do we need to be wary of any of these numbers? Why? - The Proportionate value is not the overall number 53940 instead 834
+```
+
+#EDA
+##Q1 - Time period of txhousing
+```{r warning=FALSE, message=TRUE}
+unique(txhousing$year)
+```
+
+##Q2 - Cities in txhousing
+```{r warning=FALSE, message=TRUE}
+length(unique(txhousing$city))
+```
+
+##Q3 - City with most sales
+```{r warning=FALSE, message=TRUE}
+txhousing[order(txhousing$sales, decreasing = T),]
+# City - Houston
+# Month - 7
+# Year - 2015
+```
+
+##Q4 - Relationship with Listings vs Sales
+```{r warning=FALSE, message=TRUE}
+ggplot(txhousing, aes(x=listings, y=sales))+geom_point()+geom_smooth()
+
+# Sales increases linearly with Listings
+```
+
+##Q5 - What proportion of sales is missing for each city?
+```{r warning=FALSE, message=TRUE}
+df1 <- txhousing %>% filter(is.na(sales)) %>% group_by(city) %>% summarise(n())
+df2 <- txhousing[txhousing$city %in% df1$city,] %>% group_by(city) %>% summarise(n())
+df3 <- merge(df1,df2,by="city")
+df3$Prop <- with(df3, (df3$`n().x`/df3$`n().y`)*100)
+# Prop column provides the proportionate sales data missing for city
+df3
+```
+
+
+##Q6 - Analysis of cities with sales>500 
+```{r warning=FALSE, message=TRUE}
+ddf1 <- txhousing %>% filter(sales>500) %>% group_by(city)
+# only 14 cities data are shown when filtered for sales > 500
+ggplot(ddf1, aes(x=year, y=median, color=city))+geom_point()
+# Dallas, Houston has data for most months
+# Some cities which has "sales <500", Therefore they do not show up & some months sales < 500 therefore we might want to include those records as well
+file_path_csv_housing <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\MidTerm\\housing.csv'
+write.csv(ddf1,file_path_csv_housing)
+```
