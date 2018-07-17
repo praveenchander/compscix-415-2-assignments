@@ -1,0 +1,135 @@
+---
+title: "COMPSCIX 415.2 Homework 6"
+author: "Praveen Chander"
+date: "July 17, 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Exercise 1
+##Q1, Q2
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(mosaicData)
+glimpse(Whickham)
+
+# Q1. Variables in the Dataset
+# outcome - survival status after 20 years: a factor with levels Alive Dead
+# smoker - smoking status at baseline: a factor with levels No Yes
+# age - age (in years) at the time of the first survey
+
+# Q2. Observation and its respresentation
+# 1314 observations on women with their smoking status
+```
+
+##Q3 - Inference - The person existance(outcome) is directly proportional to smoking status
+```{r warning=FALSE, message=FALSE}
+
+# The person existance(outcome) is directly proportional to smoking status
+
+d = Whickham %>% count(smoker, outcome)
+ggplot(data = d, mapping = aes(x=smoker, y=n, color=outcome)) + geom_point() + facet_wrap(~outcome, as.table = TRUE)
+```
+
+## Q4. Age Group Inference - Most Non-smokers live more than 64 years, whereas smokers die at young age
+```{r warning=FALSE, message=FALSE}
+# Most Non-smokers live more than 64 years, whereas smokers die at young age
+
+Whickham$new_ages <- case_when(
+  Whickham$age <= 44   ~ "Age less Than 44",
+  Whickham$age > 44 & Whickham$age <= 64    ~ "Age 44 to 64",
+  Whickham$age >  64   ~ "Age greater than 64"
+)
+dd2 <- Whickham %>% group_by(smoker, outcome, new_ages) %>% summarise(Tot=n())
+dd2
+ggplot(data = dd2, mapping = aes(x=smoker, y=Tot, color=outcome)) + geom_point() + facet_wrap(~new_ages, as.table = TRUE)
+
+```
+
+#Exercise 2
+##Q1, Q2
+```{r warning=FALSE, message=FALSE}
+# Q1 - Histogram / Density plot for the samples
+n <- 10000
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+gamma_samp %>% ggplot() + geom_histogram(aes(x = x), binwidth = 1) + theme_bw()
+ggplot(gamma_samp) +
+    geom_density(aes(x = x)) +
+    geom_rug(aes(x = x, y = 0), position = position_jitter(height = 0))
+
+# Q2 - Mean and Standard Deviation for distribution
+mean_samp <- gamma_samp %>% .[['x']] %>% mean()
+sd_samp <- gamma_samp %>% .[['x']] %>% sd()
+mean_samp
+sd_samp
+```
+
+## Q3 - Sample size = 30
+```{r warning=FALSE, message=FALSE}
+n <- 30
+gamma_samp <- tibble(x = rgamma(n, shape = 1, scale = 2))
+gamma_samp %>% ggplot() + geom_histogram(aes(x = x), binwidth = 1) + theme_bw()
+
+mean_samp <- gamma_samp %>% .[['x']] %>% mean()
+sd_samp <- gamma_samp %>% .[['x']] %>% sd()
+
+mean_samp
+sd_samp
+```
+
+##Q4 - Sample size 30, repeated for 10000 times
+```{r warning=FALSE, message=FALSE}
+
+# create a vector with 10000 NAs
+mean_samp <- rep(NA, 10000)
+# start a loop
+for(i in 1:10000) {
+g_samp <- rgamma(30, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+# Convert vector to a tibble
+mean_samp <- as_tibble(mean_samp)
+glimpse(mean_samp)
+```
+
+## Q5 - Histogram on mean for 30 Bins (Mean calculated for 10,000 samples)
+```{r warning=FALSE, message=FALSE}
+mean_samp %>% ggplot() + geom_histogram(aes(x = value), binwidth = 0.5) + theme_bw()
+```
+
+## Q6, Q7 - mean and SD for 30 Bins (calculated for 10,000 samples)
+```{r warning=FALSE, message=FALSE}
+avg_samp <- mean_samp %>% .[['value']] %>% mean()
+sd_samp <- mean_samp %>% .[['value']] %>% sd()
+avg_samp
+sd_samp
+
+#Q7 - The value got from the sampling of 30 Bins for 10000 times, satisfies the Central Limit Theorem
+```
+
+##Q8 - Histogram, Mean, SD for 300 Bins (calculated of 10000 samples)
+```{r warning=FALSE, message=FALSE}
+# create a vector with 10000 NAs
+mean_samp <- rep(NA, 10000)
+# start a loop
+for(i in 1:10000) {
+g_samp <- rgamma(300, shape = 1, scale = 2)
+mean_samp[i] <- mean(g_samp)
+}
+# Convert vector to a tibble
+mean_samp <- as_tibble(mean_samp)
+glimpse(mean_samp)
+mean_samp %>% ggplot() + geom_histogram(aes(x = value), binwidth = 0.5) + theme_bw()
+avg_samp <- mean_samp %>% .[['value']] %>% mean()
+sd_samp <- mean_samp %>% .[['value']] %>% sd()
+avg_samp
+sd_samp
+sd=2/sqrt(300)
+sd
+# Q8 - The values matches as per the Central Limit Theorem
+```
