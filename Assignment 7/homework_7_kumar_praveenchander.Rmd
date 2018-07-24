@@ -1,0 +1,115 @@
+---
+title: "COMPSCIX 415.2 Homework 7"
+author: "Praveen Chander"
+date: "July 20, 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Exercise 1
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(broom)
+
+file_path <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\Assignment 7\\train.csv'
+house_price_data <- read.csv(file=file_path, sep =",", header = TRUE, dec =".")
+
+
+#GLIMPSE of the data from file
+dim(house_price_data)
+
+# Observations - 1460
+# Columns - 81
+```
+
+#Exercise 2
+##Visualize the Distribution of SalePrice
+```{r warning=FALSE, message=FALSE}
+options(scipen=999)
+house_price_data %>% ggplot(aes(x=SalePrice)) + geom_histogram()
+```
+
+##Visualize covariation between SalePrice(Numeric) and Neighborhood(Nominal)
+```{r warning=FALSE, message=FALSE}
+hse_lm <- lm(SalePrice ~ Neighborhood, house_price_data)
+summary(hse_lm)
+glance(hse_lm)
+
+#Correlation of Fitted Vs R.SQUARED are almost same
+cor(house_price_data$SalePrice, hse_lm$fitted)
+sqrt(summary(hse_lm)$r.squared)
+
+
+plot(x = hse_lm$fitted, y = house_price_data$SalePrice,
+     xlab = "Fitted Price", ylab = "Observed Price")
+abline(lm(house_price_data$SalePrice ~ hse_lm$fitted), col="red")
+
+```
+
+##Visualize the covariation between SalePrice(Numeric) and OverallQual(Numeric-Ordinal)
+```{r warning=FALSE, message=FALSE}
+cor(house_price_data$SalePrice, house_price_data$OverallQual)
+
+plot(x = house_price_data$OverallQual, y = house_price_data$SalePrice,
+     xlab = "Overall Quality", ylab = "Sale Price")
+abline(lm(house_price_data$SalePrice ~ house_price_data$OverallQual), col="red")
+```
+
+#Exercise 3 - Model consisting of only MEAN
+```{r warning=FALSE, message=FALSE}
+datafr1 = cbind(house_price_data$SalePrice, mean(house_price_data$SalePrice))
+plot(x = datafr1[,1], y = datafr1[,2],
+     xlab = "Actual", ylab = "Mean")
+abline(aov(datafr1[,1] ~ datafr1[,2]), col="red")
+summary(aov(datafr1[,1] ~ datafr1[,2]))
+```
+
+#Exercise 4
+```{r warning=FALSE, message=FALSE}
+hse_lm <- lm(SalePrice ~ GrLivArea + OverallQual + Neighborhood, house_price_data)
+pairs(~ SalePrice + GrLivArea + OverallQual + Neighborhood, data=house_price_data)
+summary(hse_lm)
+options(scipen=0)
+coef(summary(hse_lm))
+
+# QUESTION 1. How would you interpret the coefficients on GrLivArea and OverallQual?
+# The 2 Variables has a STRONG correlation on SalePrice
+cor(house_price_data$SalePrice, house_price_data$GrLivArea)
+cor(house_price_data$SalePrice, house_price_data$OverallQual)
+
+# QUESTION 2. How would you interpret the coefficient on NeighborhoodBrkSide?
+# Y = B0 + B1*X1 + B2*X2 + e
+# Y = -34829.2399 + (-13025.4529)*X1 + 10450.444653
+# When BrkSide=0, the SalePrice will be around -25000 less than that of the Base Neighbourhood - Blmngtn
+
+# QUESTION 3. Are the features significant? YES
+# QUESTION 4. Are the features practically significant? YES
+# QUESTION 5. Is the model a good fit? YES with 88% Accuracy
+cor(house_price_data$SalePrice, predict(hse_lm))
+```
+
+#Exercise 6
+```{r warning=FALSE, message=FALSE}
+n <- 5
+slopes <- rep(NA, n)
+rSquared <- rep(NA, n)
+for(i in 1:n) {
+  sim1a <- tibble(
+    x = rep(1:10, each = 3),
+    y = x * 1.5 + 6 + rt(length(x), df = 2)
+    )
+  sim_lm <- lm(y~x, sim1a)
+  slopes[i] <- coef(sim_lm)[2]
+  rSquared[i] <- summary(sim_lm)$r.squared
+}
+slopes <- as_tibble(slopes)
+rSquared <- as_tibble(rSquared)
+df <- cbind(slopes, rSquared)
+df
+# Coefficients and R-Squared Values changes with wide samples/Better the value with more Samples
+```
