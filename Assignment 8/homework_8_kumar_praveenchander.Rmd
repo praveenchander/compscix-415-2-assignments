@@ -1,0 +1,35 @@
+---
+title: "homework_8_praveenchander_kumar"
+author: "Praveen Chander"
+date: "July 29, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggmap)
+library(leaflet)
+library(mdsr) # for cholera dataset
+library(rgdal) # to tell R what type of system used for cholera dataset
+
+
+library(jsonlite)
+
+map_it <- function(city) {
+url <- paste0("https://api.jcdecaux.com/vls/v1/stations?contract=",city,"&apiKey=550ea9bc2539385f6d2882617d716ee485b4fc88")
+df_api <- fromJSON(url, flatten = TRUE)
+new_avail_bike <- as.character(df_api$available_bikes)
+df_api <- cbind(df_api, new_avail_bike)
+map <- leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~df_api$position.lng, lat = ~df_api$position.lat, label = ~df_api$new_avail_bike, popup = paste("Address: ", df_api$address), data = df_api)
+map
+}
+
+cities <- c('Luxembourg', 'Dublin', 'Brisbane', 'Seville', 'Stockholm', 'Ljubljana')
+map_it(cities[1])
+
+```
