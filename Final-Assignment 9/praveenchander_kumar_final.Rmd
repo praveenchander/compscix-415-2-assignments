@@ -1,0 +1,227 @@
+---
+title: "COMPSCIX 415.2 Homework 9/Final"
+author: "Praveen Chander"
+date: "Aug 04, 2018"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Exercise 1
+## Step 1
+```{r warning=FALSE, message=FALSE}
+library(tidyverse)
+# R function to calculate the mean and standard deviation and return as list
+samp_fun <- function(samp_size, samp_rate) {
+mydf <- rexp(n = samp_size, rate = samp_rate)
+mydf <- data.frame(mydf)
+mydf <- cbind(rownames(mydf), mydf)
+rownames(mydf) <- NULL
+colnames(mydf) <- c("COL1", "VAL1")
+stats <- list(samp_avg = mean(mydf$VAL1), samp_std_dev = sd(mydf$VAL1))
+return(stats)
+}
+a <- samp_fun(100, 1/10000)
+a <- data.frame(a)
+a
+
+```
+
+## Step 2
+```{r warning=FALSE, message=FALSE}
+# Calling the function 1000 times, with samp_size = 50 and samp_rate = 1/10000 
+n <- 1000
+sample_means <- rep(NA, n)
+sample_sds <- rep(NA, n)
+for(i in 1:n) {
+a <- samp_fun(50, 1/10000)
+a <- data.frame(a)
+a <- cbind(rownames(a), a)
+rownames(a) <- NULL
+colnames(a) <- c("COL1", "VAL1", "VAL2")
+sample_means[i] <- a$VAL1
+sample_sds[i] <- a$VAL2
+}
+sample_means <- as_tibble(sample_means)
+sample_sds <- as_tibble(sample_sds)
+df <- cbind(sample_means, sample_sds)
+colnames(df) <- c("sample_means","sample_sds")
+```
+
+## Step 3
+### Calling the function 1000 times, with samp_size = 50 and samp_rate = 1/10000 
+```{r warning=FALSE, message=FALSE}
+# Sample Means plotted as Histogram
+df %>% ggplot(aes(x = df$sample_means)) +
+   geom_histogram()
+
+# Standard Deviation of the Sample Means
+df$sample_sds
+
+# Standard Error -  (σ =10000, n = sample size 50)
+10000/sqrt(50)
+
+# Mean of Standard deviation
+mnSd <- mean(df$sample_sds)
+mnSd # Approximately equal to 10000
+mnSd/sqrt(50)
+cat(sprintf("10000/sqrt(50)=\"%s\" is approximately equal to mean_of_Sd/sqrt(50)=\"%f\" \n", 10000/sqrt(50), mnSd/sqrt(50)))
+```
+
+## Step 4
+### Calling the function 1000 times, with samp_size = 500 and samp_rate = 1/10000 
+```{r warning=FALSE, message=FALSE}
+# Calling the function 1000 times, with samp_size = 500 and samp_rate = 1/10000 
+n <- 1000
+sample_means <- rep(NA, n)
+sample_sds <- rep(NA, n)
+for(i in 1:n) {
+a <- samp_fun(500, 1/10000)
+a <- data.frame(a)
+a <- cbind(rownames(a), a)
+rownames(a) <- NULL
+colnames(a) <- c("COL1", "VAL1", "VAL2")
+sample_means[i] <- a$VAL1
+sample_sds[i] <- a$VAL2
+}
+sample_means <- as_tibble(sample_means)
+sample_sds <- as_tibble(sample_sds)
+df <- cbind(sample_means, sample_sds)
+colnames(df) <- c("sample_means","sample_sds")
+
+# Sample Means plotted as Histogram
+df %>% ggplot(aes(x = df$sample_means)) +
+   geom_histogram()
+
+# Standard Deviation of the Sample Means
+df$sample_sds
+
+# Standard Error -  (σ =10000, n = sample size 500)
+10000/sqrt(500)
+
+# Mean of Standard deviation
+mnSd <- mean(df$sample_sds)
+mnSd # Approximately equal to 10000
+mnSd/sqrt(500)
+cat(sprintf("10000/sqrt(500)=\"%s\" is approximately equal to mean_of_Sd/sqrt(500)=\"%f\" \n", 10000/sqrt(500), mnSd/sqrt(500)))
+```
+
+### Calling the function 1000 times, with samp_size = 5000 and samp_rate = 1/10000 
+```{r warning=FALSE, message=FALSE}
+# Calling the function 1000 times, with samp_size = 5000 and samp_rate = 1/10000
+n <- 1000
+sample_means <- rep(NA, n)
+sample_sds <- rep(NA, n)
+for(i in 1:n) {
+a <- samp_fun(5000, 1/10000)
+a <- data.frame(a)
+a <- cbind(rownames(a), a)
+rownames(a) <- NULL
+colnames(a) <- c("COL1", "VAL1", "VAL2")
+sample_means[i] <- a$VAL1
+sample_sds[i] <- a$VAL2
+}
+sample_means <- as_tibble(sample_means)
+sample_sds <- as_tibble(sample_sds)
+df <- cbind(sample_means, sample_sds)
+colnames(df) <- c("sample_means","sample_sds")
+
+# Sample Means plotted as Histogram
+df %>% ggplot(aes(x = df$sample_means)) +
+   geom_histogram()
+
+# Standard Deviation of the Sample Means
+df$sample_sds
+
+# Standard Error -  (σ =10000, n = sample size 5000)
+10000/sqrt(5000)
+
+# Mean of Standard deviation
+mnSd <- mean(df$sample_sds)
+mnSd # Approximately equal to 10000
+mnSd/sqrt(5000)
+cat(sprintf("10000/sqrt(5000)=\"%s\" is approximately equal to mean_of_Sd/sqrt(5000)=\"%f\" \n", 10000/sqrt(5000), mnSd/sqrt(5000)))
+```
+
+#Exercise 2
+```{r warning=FALSE, message=FALSE}
+library(broom)
+options(scipen=999)
+
+file_path <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\Final-Assignment 9\\train.csv'
+house_price_data <- read.csv(file=file_path, sep =",", header = TRUE, dec =".")
+
+hse_lm <- lm(SalePrice ~ LotArea + OverallQual + ExterQual, house_price_data)
+
+# QUESTION 1.
+# Coefficients & R Squared Values
+coef(hse_lm)
+cat(sprintf("R Squared =\"%s\" \n", summary(hse_lm)$r.squared))
+
+summary(hse_lm)
+
+# QUESTION 2. How would you interpret the coefficient on LotArea?
+# Y = B0 + B1*X1 + e
+# Y = 40764 + (-1.45)*X1 + 0.1162
+# When LotArea=0, the SalePrice will be around 40764
+
+# QUESTION 3. How would you interpret the coefficient on ExterQualGd?
+# Y = B0 + B1*X1 + B2*X2 + e
+# Y = 40764 + (-71529.4934)*X1 + 6737.0625
+# When ExterQualGd=0, the SalePrice will be around 47400 more than that of the Base ExterQual - Ex
+
+hse_lm2 <- lm(SalePrice ~ GrLivArea + OverallQual + Neighborhood, house_price_data)
+cor(house_price_data$SalePrice, predict(hse_lm))
+cor(house_price_data$SalePrice, predict(hse_lm2))
+
+# QUESTION 4. The Model with GrLivArea + OverallQual + Neighborhood is Better based on the correlation between the SalePrice and the Predicted value
+```
+
+#Exercise 3
+```{r warning=FALSE, message=FALSE}
+file_path2 <- 'C:\\Users\\PraveenChander\\Desktop\\pySparking\\Class 3 - Introduction to Data Science - COMPSCIX 415.2\\compscix-415-2-assignments\\Final-Assignment 9\\ab_test_data.csv'
+ab_test_data <- read.csv(file=file_path2, sep =",", header = TRUE, dec =".")
+df_ab <- data.frame(ab_test_data)
+# QUESTION 1 - Percentage of conversion for each Versions
+
+df_ab_A <- df_ab %>% filter(df_ab$version == 'A') %>% count()
+df_ab_A <- as.numeric(df_ab_A)
+df_ab_A_conv <- df_ab %>% filter(df_ab$version == 'A' & df_ab$conversion == 1) %>% count()
+true_A <- (df_ab_A_conv)/df_ab_A
+true_A <- as.numeric(true_A)
+cat(sprintf("Percentage converted for version A =\"%s\" \n", (df_ab_A_conv*100)/df_ab_A))
+
+df_ab_B <- df_ab %>% filter(df_ab$version == 'B') %>% count()
+df_ab_B <- as.numeric(df_ab_B)
+df_ab_B_conv <- df_ab %>% filter(df_ab$version == 'B' & df_ab$conversion == 1) %>% count()
+true_B <- (df_ab_B_conv)/df_ab_B
+true_B <- as.numeric(true_B)
+cat(sprintf("Percentage converted for version B =\"%s\" \n", (df_ab_B_conv*100)/df_ab_B))
+
+# QUESTION 2 - Version A and B are significantly different than each other, so we'd conclude here that whatever changes were made to the webpage did have an effect.
+
+samp_a <- rbinom(n = 1, size = df_ab_A, prob = true_A)
+samp_b <- rbinom(n = 1, size = df_ab_B, prob = true_B)
+
+samp_a
+samp_b
+
+two_prop_test <- prop.test(c(samp_a, samp_b), c(1000, 1000))
+two_prop_test$p.value
+
+
+
+
+
+
+
+
+
+
+
+
+```
