@@ -164,6 +164,7 @@ cat(sprintf("R Squared =\"%s\" \n", summary(hse_lm)$r.squared))
 
 summary(hse_lm)
 
+
 # QUESTION 2. How would you interpret the coefficient on LotArea?
 # Y = B0 + B1*X1 + e
 # Y = 40764 + (-1.45)*X1 + 0.1162
