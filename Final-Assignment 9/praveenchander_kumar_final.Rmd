@@ -60,7 +60,7 @@ df %>% ggplot(aes(x = df$sample_means)) +
    geom_histogram()
 
 # Standard Deviation of the Sample Means
-df$sample_sds
+sd(df$sample_means)
 
 # Standard Error -  (σ =10000, n = sample size 50)
 10000/sqrt(50)
@@ -98,7 +98,7 @@ df %>% ggplot(aes(x = df$sample_means)) +
    geom_histogram()
 
 # Standard Deviation of the Sample Means
-df$sample_sds
+sd(df$sample_means)
 
 # Standard Error -  (σ =10000, n = sample size 500)
 10000/sqrt(500)
@@ -135,7 +135,7 @@ df %>% ggplot(aes(x = df$sample_means)) +
    geom_histogram()
 
 # Standard Deviation of the Sample Means
-df$sample_sds
+sd(df$sample_means)
 
 # Standard Error -  (σ =10000, n = sample size 5000)
 10000/sqrt(5000)
